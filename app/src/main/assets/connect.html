@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Black Vich</title>
+<style>
+/* فونت‌ها: فایل Vazirmatn-Variable.woff2 را در app/src/main/assets/fonts بگذار (راهنما در README) */
+@font-face{font-family:"Vazirmatn";src:url("https://appassets.local/fonts/Vazirmatn-Variable.woff2") format("woff2");font-weight:100 900;font-display:swap}
+:root{
+  --void:#060504;--cream:#f6e3bd;--cream-soft:#ecd3a4;--muted:#9c8f78;
+  --f1:#ff8a3d;--f2:#f5401f;--f3:#c4121c;--gold:#f0cf8e;--green:#43c07a;--red:#f1402c;
+  --glass:rgba(255,246,232,.06);--glass2:rgba(255,246,232,.11);--edge:rgba(255,246,232,.16);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--void);color:var(--cream-soft);
+  font-family:"Vazirmatn","Segoe UI",Tahoma,sans-serif;overflow:hidden;user-select:none}
+body{display:flex;align-items:center;justify-content:center;padding:18px}
+
+/* ---------- پس‌زمینه‌ی آتشین ---------- */
+.bg{position:fixed;inset:0;overflow:hidden;z-index:0}
+.blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.75;will-change:transform}
+.b1{width:70vmax;height:70vmax;left:-25vmax;top:-30vmax;background:radial-gradient(circle,var(--f2),transparent 65%);animation:d1 16s ease-in-out infinite alternate}
+.b2{width:60vmax;height:60vmax;right:-28vmax;top:5vmax;background:radial-gradient(circle,#e2ac4e88,transparent 65%);animation:d2 21s ease-in-out infinite alternate}
+.b3{width:80vmax;height:80vmax;left:-10vmax;bottom:-45vmax;background:radial-gradient(circle,var(--f3),transparent 62%);animation:d3 19s ease-in-out infinite alternate}
+@keyframes d1{to{transform:translate(18vmax,12vmax) scale(1.2)}}
+@keyframes d2{to{transform:translate(-14vmax,16vmax) scale(.85)}}
+@keyframes d3{to{transform:translate(12vmax,-10vmax) scale(1.15)}}
+canvas#embers{position:absolute;inset:0;width:100%;height:100%}
+.grain{position:absolute;inset:0;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>")}
+
+/* ---------- کارت شیشه‌ای ---------- */
+.stage{position:relative;z-index:2;width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center}
+.logo-wrap{position:relative;width:104px;height:104px;margin-bottom:14px;animation:rise .9s cubic-bezier(.2,.9,.2,1) both}
+.logo-wrap::before{content:"";position:absolute;inset:-18px;border-radius:50%;
+  background:conic-gradient(from 0deg,var(--f2),var(--gold),var(--f3),var(--f1),var(--f2));filter:blur(18px);opacity:.7;animation:spin 7s linear infinite}
+.logo-wrap img{position:relative;width:100%;height:100%;border-radius:28px;object-fit:cover;box-shadow:0 14px 40px #000a;border:1px solid var(--edge)}
+@keyframes spin{to{transform:rotate(360deg)}}
+h1{margin:0;font-size:28px;font-weight:900;letter-spacing:2.5px;
+  background:linear-gradient(100deg,var(--cream),var(--gold) 40%,var(--f1) 70%,var(--cream));
+  background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:shine 5s linear infinite,rise .9s .08s cubic-bezier(.2,.9,.2,1) both}
+@keyframes shine{to{background-position:-220% 0}}
+.sub{margin:4px 0 18px;font-size:13px;color:var(--muted);animation:rise .9s .16s both}
+@keyframes rise{from{opacity:0;transform:translateY(22px) scale(.96)}to{opacity:1;transform:none}}
+
+.card{position:relative;width:100%;padding:18px;border-radius:28px;
+  background:linear-gradient(160deg,rgba(255,246,232,.12),rgba(255,246,232,.04));
+  border:1px solid var(--edge);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
+  box-shadow:0 24px 60px #000a,inset 0 1px 0 rgba(255,255,255,.35);animation:rise 1s .24s cubic-bezier(.2,.9,.2,1) both;overflow:hidden}
+.card::before{content:"";position:absolute;top:0;left:-60%;width:50%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.12),transparent);transform:skewX(-18deg);animation:sweep 6s 1.2s infinite}
+@keyframes sweep{0%{left:-60%}35%,100%{left:140%}}
+.card.shake{animation:shake .5s}
+@keyframes shake{20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
+
+.tabs{position:relative;display:flex;padding:4px;border-radius:16px;background:#0006;border:1px solid var(--edge);margin-bottom:16px}
+.tabs button{flex:1;z-index:1;border:0;background:none;color:var(--muted);font:700 14px inherit;font-family:inherit;padding:11px 0;border-radius:12px;transition:color .3s}
+.tabs button.on{color:#fff}
+.pill{position:absolute;top:4px;bottom:4px;width:calc(50% - 4px);border-radius:12px;right:4px;
+  background:linear-gradient(135deg,var(--f1),var(--f2) 55%,var(--f3));box-shadow:0 6px 20px #f5401f66;transition:transform .45s cubic-bezier(.3,1.3,.5,1)}
+.tabs[data-t="1"] .pill{transform:translateX(-100%)}
+
+.pane{display:none;animation:fade .45s both}.pane.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+label{display:block;font-size:12px;color:var(--muted);margin:0 4px 7px;font-weight:600}
+.field{position:relative}
+input{width:100%;padding:15px 16px;border-radius:16px;border:1px solid var(--edge);background:#0007;color:var(--cream);
+  font:600 16px inherit;font-family:inherit;direction:ltr;text-align:left;outline:none;transition:.25s;user-select:text}
+input::placeholder{color:#6f6553;direction:rtl}
+input:focus{border-color:var(--f1);box-shadow:0 0 0 4px #f5401f33,0 0 28px #f5401f33}
+.hint{font-size:12px;color:var(--muted);margin:9px 4px 0;line-height:1.9}
+
+.btn{position:relative;width:100%;margin-top:14px;padding:16px;border:0;border-radius:18px;color:#fff;font:800 16px inherit;font-family:inherit;overflow:hidden;
+  background:linear-gradient(135deg,var(--f1),var(--f2) 50%,var(--f3));box-shadow:0 12px 30px #f5401f55,inset 0 1px 0 #fff6;transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn .spin{display:none;width:20px;height:20px;border-radius:50%;border:3px solid #fff5;border-top-color:#fff;animation:spin .7s linear infinite;margin:auto}
+.btn.busy span{display:none}.btn.busy .spin{display:block}
+.btn.ghost{background:var(--glass2);box-shadow:none;border:1px solid var(--edge);color:var(--cream)}
+
+/* QR */
+.qr-box{position:relative;width:176px;height:176px;margin:4px auto 6px}
+.qr-box i{position:absolute;width:38px;height:38px;border:4px solid var(--gold);border-radius:12px;animation:pulse 2s ease-in-out infinite}
+.qr-box i:nth-child(1){top:0;right:0;border-left:0;border-bottom:0}
+.qr-box i:nth-child(2){top:0;left:0;border-right:0;border-bottom:0}
+.qr-box i:nth-child(3){bottom:0;right:0;border-left:0;border-top:0}
+.qr-box i:nth-child(4){bottom:0;left:0;border-right:0;border-top:0}
+@keyframes pulse{50%{transform:scale(.88);opacity:.6}}
+.qr-box svg{position:absolute;inset:34px;width:calc(100% - 68px);height:calc(100% - 68px);color:var(--cream);opacity:.9}
+.scanline{position:absolute;left:14px;right:14px;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,var(--f1),transparent);box-shadow:0 0 16px var(--f1);animation:scan 2.4s ease-in-out infinite}
+@keyframes scan{0%,100%{top:18px}50%{top:calc(100% - 20px)}}
+
+/* تاریخچه */
+.hist{width:100%;margin-top:16px;animation:rise 1s .4s both}
+.hist small{display:block;color:var(--muted);font-size:12px;margin:0 6px 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;background:var(--glass);border:1px solid var(--edge);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font:600 13px inherit;font-family:inherit;direction:ltr;color:var(--cream);transition:.2s}
+.chip:active{transform:scale(.94);background:var(--glass2)}
+.chip b{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.chip u{text-decoration:none;color:var(--muted);padding-inline-start:4px}
+
+.msg{min-height:20px;margin-top:12px;font-size:12.5px;line-height:1.9;color:var(--red);text-align:center}
+
+/* اورلی اتصال */
+.ov{position:fixed;inset:0;z-index:20;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:#060504ee;backdrop-filter:blur(8px)}
+.ov.on{display:flex;animation:fade .3s both}
+.rings{position:relative;width:120px;height:120px}
+.rings span{position:absolute;inset:0;border-radius:50%;border:2px solid var(--f1);animation:ring 2s ease-out infinite;opacity:0}
+.rings span:nth-child(2){animation-delay:.6s}.rings span:nth-child(3){animation-delay:1.2s}
+@keyframes ring{0%{transform:scale(.3);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+.rings img{position:absolute;inset:22px;width:76px;height:76px;border-radius:22px}
+.ov p{margin:0;font-weight:700;color:var(--cream)}
+.ov.ok .rings span{border-color:var(--green)}
+.tick{display:none;width:84px;height:84px}.ov.ok .tick{display:block}.ov.ok .rings{display:none}
+.tick circle{fill:none;stroke:var(--green);stroke-width:4;stroke-dasharray:252;stroke-dashoffset:252;animation:dash .6s ease forwards}
+.tick path{fill:none;stroke:var(--green);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:dash .4s .5s ease forwards}
+@keyframes dash{to{stroke-dashoffset:0}}
+
+.btn.help{margin-top:10px;padding:13px;font-size:14px}
+/* ---------- راهنما ---------- */
+.sheet{position:fixed;inset:0;z-index:30;display:none;align-items:flex-end;justify-content:center;background:#000b;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.sheet.on{display:flex;animation:fade .3s both}
+.sheet .box{width:100%;max-width:480px;max-height:92vh;overflow-y:auto;padding:20px 18px 26px;border-radius:30px 30px 0 0;
+  background:linear-gradient(170deg,rgba(40,28,20,.97),rgba(14,10,8,.98));border:1px solid var(--edge);border-bottom:0;
+  box-shadow:0 -20px 60px #000c;animation:up .5s cubic-bezier(.2,1,.3,1) both}
+@keyframes up{from{transform:translateY(100%)}}
+.grab{width:44px;height:5px;border-radius:5px;background:var(--edge);margin:0 auto 14px}
+.box h2{margin:0 0 4px;font-size:19px;color:var(--cream)}
+.box .lead{margin:0 0 14px;font-size:12.5px;color:var(--muted);line-height:1.9}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{position:relative;counter-increment:s;padding:11px 50px 11px 10px;margin-bottom:8px;border-radius:16px;background:var(--glass);border:1px solid var(--edge);
+  font-size:13.5px;line-height:1.9;color:var(--cream-soft);opacity:0;animation:rise .5s both}
+.steps li:nth-child(1){animation-delay:.1s}.steps li:nth-child(2){animation-delay:.2s}.steps li:nth-child(3){animation-delay:.3s}.steps li:nth-child(4){animation-delay:.4s}.steps li:nth-child(5){animation-delay:.5s}
+.steps li::before{content:counter(s);position:absolute;right:10px;top:11px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:900;color:#fff;background:linear-gradient(135deg,var(--f1),var(--f3));box-shadow:0 4px 14px #f5401f55}
+.steps b{color:var(--gold)}
+.mock{margin:14px 0 4px;padding:12px;border-radius:18px;background:#16100c;border:1px solid var(--edge);direction:rtl}
+.mock .t{font-size:11px;color:var(--gold);font-weight:800;margin-bottom:8px}
+.mock .tabsm{display:flex;gap:5px;margin-bottom:9px}
+.mock .tabsm span{flex:1;text-align:center;font-size:11px;padding:6px 0;border-radius:8px;background:#2a1d15;color:var(--muted)}
+.mock .tabsm span.hl{background:linear-gradient(135deg,var(--f1),var(--f3));color:#fff;font-weight:800;animation:glow 1.6s ease-in-out infinite}
+.mock .qrm{width:70px;height:70px;margin:0 auto 8px;border-radius:8px;background:
+  conic-gradient(#111 25%,#fff 0 50%,#111 0 75%,#fff 0) 0 0/14px 14px;border:4px solid #fff}
+.mock .urlm{direction:ltr;text-align:center;font:700 12px Consolas,monospace;padding:7px;border-radius:8px;background:#0d0906;color:var(--gold);border:1px dashed var(--gold);animation:glow 1.6s .3s ease-in-out infinite}
+.mock .cpm{margin-top:8px;text-align:center;font-size:11px;font-weight:800;color:#fff;padding:7px;border-radius:8px;background:#a2301a;animation:glow 1.6s .6s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 0 3px #ffb35a66,0 0 18px #ff8a3d99}}
+.mock .lbl{font-size:10.5px;color:var(--muted);text-align:center;margin:-3px 0 6px}
+</style>
+</head>
+<body>
+<div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><canvas id="embers"></canvas><div class="grain"></div></div>
+
+<main class="stage">
+  <div class="logo-wrap"><img src="logo.png" alt=""></div>
+  <h1>BLACK VICH</h1>
+  <div class="sub">بخش آشپزخانه · اتصال به کامپیوتر</div>
+
+  <section class="card" id="card">
+    <div class="tabs" id="tabs" data-t="0">
+      <div class="pill"></div>
+      <button class="on" data-t="0">ورود با لینک</button>
+      <button data-t="1">اسکن QR</button>
+    </div>
+
+    <div class="pane on" id="p0">
+      <label>آدرس نمایش‌داده‌شده روی کامپیوتر</label>
+      <div class="field"><input id="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="http://192.168.1.5:8000/kitchen"></div>
+      <div class="hint">لینک تب «آشپزخانه» را از مرکز کنترل کامپیوتر کپی کن و اینجا بچسبان. فقط آی‌پی هم کافی است، مثل <span dir="ltr">192.168.1.5</span></div>
+      <button class="btn" id="go"><span>اتصال به کامپیوتر</span><div class="spin"></div></button>
+    </div>
+
+    <div class="pane" id="p1">
+      <div class="qr-box">
+        <i></i><i></i><i></i><i></i><div class="scanline"></div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3m4 0v4h-4m-3-3v3"/></svg>
+      </div>
+      <div class="hint" style="text-align:center">دوربین را روی QR مرکز کنترل کامپیوتر بگیر (تب «آشپزخانه» انتخاب باشد)</div>
+      <button class="btn" id="scan"><span>باز کردن دوربین</span><div class="spin"></div></button>
+    </div>
+
+    <button class="btn ghost help" id="help" type="button"><span>❓ راهنما: لینک را از کجا بگیرم؟</span></button>
+    <div class="msg" id="msg"></div>
+  </section>
+
+  <div class="hist" id="hist" style="display:none"><small>اتصال‌های اخیر</small><div class="chips" id="chips"></div></div>
+</main>
+
+
+<div class="sheet" id="sheet">
+  <div class="box">
+    <div class="grab"></div>
+    <h2>لینک اتصال را از کجا بگیرم؟</h2>
+    <p class="lead">لینک روی خود کامپیوتر و در برنامه‌ی Black Vich نمایش داده می‌شود. گوشی و کامپیوتر باید به <b style="color:var(--gold)">یک وای‌فای</b> وصل باشند.</p>
+    <ol class="steps">
+      <li>روی کامپیوتر <b>Black Vich</b> را اجرا کن تا پنجره‌ی «مرکز کنترل» باز شود.</li>
+      <li>پایین‌تر، کادر <b>«اشتراک‌گذاری با گوشی و سیستم‌های دیگر»</b> را پیدا کن.</li>
+      <li>در بالای آن کادر روی تب <b>«آشپزخانه»</b> بزن.</li>
+      <li>زیر QR، لینکی مثل <b dir="ltr">http://192.168.1.5:8000/kitchen</b> می‌بینی. دکمه‌ی <b>«کپی لینک»</b> را بزن و آن را برای گوشی بفرست (مثلاً Saved Messages تلگرام).</li>
+      <li>همان لینک را در این برنامه بچسبان و <b>اتصال</b> را بزن. یا به‌جای آن، تب «اسکن QR» را بزن و دوربین را روی QR بگیر.</li>
+    </ol>
+    <div class="mock">
+      <div class="t">نمونه‌ی همان کادر روی کامپیوتر:</div>
+      <div class="tabsm"><span>مدیریت</span><span class="hl">آشپزخانه ← این را بزن</span><span>سفارش</span></div>
+      <div class="qrm"></div><div class="lbl">QR (می‌توانی اسکن کنی)</div>
+      <div class="urlm">http://192.168.1.5:8000/kitchen</div>
+      <div class="cpm">کپی لینک</div>
+    </div>
+    <button class="btn" id="helpClose" type="button"><span>متوجه شدم</span></button>
+  </div>
+</div>
+
+<div class="ov" id="ov">
+  <div class="rings"><span></span><span></span><span></span><img src="logo.png" alt=""></div>
+  <svg class="tick" viewBox="0 0 84 84"><circle cx="42" cy="42" r="40"/><path d="M26 43l11 11 21-23"/></svg>
+  <p id="ovt">در حال اتصال…</p>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), A=window.Android;
+const haptic=ms=>{try{A&&A.haptic(ms)}catch(e){}};
+
+/* ---------- جرقه‌های شناور ---------- */
+(function(){
+  const c=$("#embers"),x=c.getContext("2d");let W,H,P=[];
+  const rs=()=>{W=c.width=innerWidth*devicePixelRatio;H=c.height=innerHeight*devicePixelRatio};rs();addEventListener("resize",rs);
+  const mk=()=>({x:Math.random()*W,y:H+Math.random()*80,r:(Math.random()*2.2+.6)*devicePixelRatio,v:(Math.random()*.7+.25)*devicePixelRatio,
+    w:Math.random()*6.28,a:Math.random()*.7+.3,h:20+Math.random()*30});
+  for(let i=0;i<46;i++){const p=mk();p.y=Math.random()*H;P.push(p)}
+  (function f(){x.clearRect(0,0,W,H);
+    for(const p of P){p.y-=p.v;p.w+=.02;p.x+=Math.sin(p.w)*.5;p.a-=.0009;
+      if(p.y<-10||p.a<=0)Object.assign(p,mk());
+      x.beginPath();x.fillStyle=`hsla(${p.h},100%,60%,${p.a})`;x.shadowColor=`hsl(${p.h},100%,55%)`;x.shadowBlur=12;
+      x.arc(p.x,p.y,p.r,0,6.28);x.fill()}
+    requestAnimationFrame(f)})();
+})();
+
+/* ---------- تب‌ها ---------- */
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
+  const t=b.dataset.t;$("#tabs").dataset.t=t;haptic(12);
+  document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x===b));
+  document.querySelectorAll(".pane").forEach((p,i)=>p.classList.toggle("on",String(i)===t));
+  $("#msg").textContent="";
+});
+
+/* ---------- منطق اتصال ---------- */
+function normalize(raw){
+  raw=(raw||"").trim().replace(/\s+/g,"");
+  if(!raw)return null;
+  if(!/^https?:\/\//i.test(raw))raw="http://"+raw;
+  try{const u=new URL(raw);if(!u.hostname)return null;
+    const port=u.port||"8000";return {origin:u.protocol+"//"+u.hostname+":"+port,
+      page:"/kitchen"}}
+  catch(e){return null}
+}
+function err(t){$("#msg").textContent=t;const c=$("#card");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake");haptic(40)}
+function ov(on,text,ok){const o=$("#ov");o.classList.toggle("on",on);o.classList.toggle("ok",!!ok);if(text)$("#ovt").textContent=text}
+
+async function tryConnect(raw,silent){
+  const n=normalize(raw);
+  if(!n){err("لینک معتبر نیست. مثال: 192.168.1.5:8000");return}
+  $("#msg").textContent="";ov(true,"در حال اتصال به "+n.origin.replace(/^https?:\/\//,"")+" …");
+  const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),5000);
+  try{
+    const r=await fetch(n.origin+"/api/settings",{signal:ctl.signal,cache:"no-store"});
+    clearTimeout(to);
+    if(!r.ok)throw 0;
+    const j=await r.json();if(!("pin_enabled" in j))throw 0;
+    ov(true,"متصل شد",true);haptic(30);
+    setTimeout(()=>{A?A.connect(n.origin,n.page):location.href=n.origin+"/kitchen"},1100);
+  }catch(e){
+    clearTimeout(to);ov(false);
+    err(silent?"اتصال خودکار انجام نشد. لینک را دوباره وارد کن یا QR را اسکن کن.":
+      "به کامپیوتر وصل نشد. برنامه‌ی Black Vich روی کامپیوتر روشن باشد و گوشی روی همان وای‌فای باشد.");
+  }
+}
+
+$("#go").onclick=()=>tryConnect($("#url").value);
+$("#url").addEventListener("keydown",e=>{if(e.key==="Enter")tryConnect(e.target.value)});
+$("#scan").onclick=()=>{haptic(15);A?A.scan():err("اسکن فقط داخل برنامه‌ی اندروید کار می‌کند")};
+
+/* نتیجه‌ی اسکن از بخش native */
+window.onScanResult=t=>tryConnect(t);
+window.onScanCancel=()=>{};
+window.onScanDenied=()=>err("برای اسکن QR باید اجازه‌ی دوربین را بدهی. یا از «ورود با لینک» استفاده کن.");
+
+/* ---------- تاریخچه ---------- */
+function renderHist(){
+  let h=[];try{h=JSON.parse(A?A.getHistory():"[]")}catch(e){}
+  $("#hist").style.display=h.length?"block":"none";
+  const c=$("#chips");c.innerHTML="";
+  h.forEach(o=>{const b=document.createElement("button");b.className="chip";
+    b.innerHTML="<b></b>"+o.replace(/^https?:\/\//,"")+"<u>✕</u>";
+    b.onclick=e=>{if(e.target.tagName==="U"){A&&A.forget(o);renderHist();haptic(10);return}tryConnect(o)};
+    c.appendChild(b)});
+}
+renderHist();
+
+
+/* ---------- راهنما ---------- */
+const sh=$("#sheet");
+$("#help").onclick=()=>{haptic(12);sh.classList.add("on")};
+$("#helpClose").onclick=()=>{sh.classList.remove("on")};
+sh.addEventListener("click",e=>{if(e.target===sh)sh.classList.remove("on")});
+
+/* ---------- ورودی صفحه ---------- */
+const q=new URLSearchParams(location.search);
+if(q.get("err")){$("#msg").textContent=q.get("err");}
+if(q.get("auto")==="1"){let l="";try{l=A.getLast()}catch(e){}if(l)tryConnect(l,true)}
+</script>
+</body>
+</html>
